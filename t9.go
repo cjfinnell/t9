@@ -8,12 +8,41 @@ import (
 
 const wordsFilePath = "./small-words.txt"
 
+var runeToNum = map[rune]int{
+	'a': 2,
+	'b': 2,
+	'c': 2,
+	'd': 3,
+	'e': 3,
+	'f': 3,
+	'g': 4,
+	'h': 4,
+	'i': 4,
+	'j': 5,
+	'k': 5,
+	'l': 5,
+	'm': 6,
+	'n': 6,
+	'o': 6,
+	'p': 7,
+	'q': 7,
+	'r': 7,
+	's': 7,
+	't': 8,
+	'u': 8,
+	'v': 8,
+	'w': 9,
+	'x': 9,
+	'y': 9,
+	'z': 9,
+}
+
 // rune is a type alias for readability, representing a single Unicode character.
 type rune byte
 
 // TrieNode represents a node in a trie data structure.
 type TrieNode struct {
-	children map[rune]*TrieNode
+	children map[int]*TrieNode
 	words    []string
 }
 
@@ -24,13 +53,14 @@ func (n *TrieNode) AddWord(word string) {
 	}
 
 	firstRune := rune(word[0])
+	runeNum := runeToNum[firstRune]
 	remainder := word[1:]
 
-	if _, ok := n.children[firstRune]; !ok {
-		n.children[firstRune] = &TrieNode{children: make(map[rune]*TrieNode)}
+	if _, ok := n.children[runeNum]; !ok {
+		n.children[runeNum] = &TrieNode{children: make(map[int]*TrieNode)}
 	}
 
-	n.children[firstRune].AddWord(remainder)
+	n.children[runeNum].AddWord(remainder)
 }
 
 // NewWordTrie creates a new trie from a file containing words.
@@ -41,7 +71,7 @@ func NewWordTrie(filePath string) (*TrieNode, error) {
 	}
 	defer wordsFile.Close()
 
-	root := &TrieNode{children: make(map[rune]*TrieNode)}
+	root := &TrieNode{children: make(map[int]*TrieNode)}
 
 	scanner := bufio.NewScanner(wordsFile)
 	for scanner.Scan() {
