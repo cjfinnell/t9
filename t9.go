@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
-	"os"
 	"sort"
 	"strings"
 )
@@ -129,21 +128,4 @@ func NewWordTrie(wordsSource io.Reader) (*TrieNode, error) {
 	slog.Info(fmt.Sprintf("loaded %d words into trie", count))
 
 	return root, nil
-}
-
-func main() {
-	fmt.Printf("loading words from %s\n", wordsFilePath)
-	wordsFile, err := os.Open(wordsFilePath)
-	if err != nil {
-		panic(fmt.Errorf("failed to open words file: %w", err))
-	}
-	defer wordsFile.Close()
-
-	_, err = NewWordTrie(wordsFile)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	fmt.Println("words loaded")
 }
