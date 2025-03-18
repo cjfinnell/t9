@@ -47,20 +47,22 @@ type TrieNode struct {
 }
 
 // AddWord adds a word to the trie, recursively creating nodes as needed.
-func (n *TrieNode) AddWord(word string) {
-	if word == "" {
+func (n *TrieNode) AddWord(word, wordPart string) {
+	if wordPart == "" {
+		n.words = append(n.words, word)
+
 		return
 	}
 
-	firstRune := rune(word[0])
+	firstRune := rune(wordPart[0])
 	runeNum := runeToNum[firstRune]
-	remainder := word[1:]
+	remainder := wordPart[1:]
 
 	if _, ok := n.children[runeNum]; !ok {
 		n.children[runeNum] = &TrieNode{children: make(map[int]*TrieNode)}
 	}
 
-	n.children[runeNum].AddWord(remainder)
+	n.children[runeNum].AddWord(word, remainder)
 }
 
 // NewWordTrie creates a new trie from a file containing words.
@@ -76,7 +78,7 @@ func NewWordTrie(filePath string) (*TrieNode, error) {
 	scanner := bufio.NewScanner(wordsFile)
 	for scanner.Scan() {
 		word := scanner.Text()
-		root.AddWord(word)
+		root.AddWord(word, "")
 	}
 
 	if err := scanner.Err(); err != nil {
