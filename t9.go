@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"os"
 )
 
@@ -66,16 +67,10 @@ func (n *TrieNode) AddWord(word, wordPart string) {
 }
 
 // NewWordTrie creates a new trie from a file containing words.
-func NewWordTrie(filePath string) (*TrieNode, error) {
-	wordsFile, err := os.Open(filePath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to open words file: %w", err)
-	}
-	defer wordsFile.Close()
-
+func NewWordTrie(wordsSource io.Reader) (*TrieNode, error) {
 	root := &TrieNode{children: make(map[int]*TrieNode)}
 
-	scanner := bufio.NewScanner(wordsFile)
+	scanner := bufio.NewScanner(wordsSource)
 	for scanner.Scan() {
 		word := scanner.Text()
 		root.AddWord(word, "")
@@ -90,8 +85,13 @@ func NewWordTrie(filePath string) (*TrieNode, error) {
 
 func main() {
 	fmt.Printf("loading words from %s\n", wordsFilePath)
+	wordsFile, err := os.Open(wordsFilePath)
+	if err != nil {
+		panic(fmt.Errorf("failed to open words file: %w", err))
+	}
+	defer wordsFile.Close()
 
-	_, err := NewWordTrie(wordsFilePath)
+	_, err = NewWordTrie(wordsFile)
 	if err != nil {
 		fmt.Println(err)
 		return
