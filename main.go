@@ -1,28 +1,14 @@
 package main
 
 import (
-	"fmt"
-	"log/slog"
-	"os"
+	"log"
+
+	tea "github.com/charmbracelet/bubbletea"
 )
 
 func main() {
-	slog.Debug(fmt.Sprintf("loading words from %s", wordsFilePath))
-
-	wordsFile, err := os.Open(wordsFilePath)
-	if err != nil {
-		slog.With("error", err).Error("failed to open words file")
-
-		os.Exit(1)
+	p := tea.NewProgram(initialModel())
+	if _, err := p.Run(); err != nil {
+		log.Fatal(err)
 	}
-	defer wordsFile.Close()
-
-	_, err = NewWordTrie(wordsFile)
-	if err != nil {
-		slog.With("error", err).Error("failed to construct word trie")
-
-		os.Exit(1)
-	}
-
-	slog.Debug("words loaded")
 }
